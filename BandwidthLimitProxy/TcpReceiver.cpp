@@ -1,101 +1,87 @@
 #include "TcpReceiver.h"
 
-TcpReceiver::TcpReceiver(CacheManager *cacheManager, int portNum,int mode) {
-	_itoa(portNum, this->m_port_num, 10);
-	this->m_cache_manager = cacheManager;
-	this->m_mode = mode;
+TcpReceiver::TcpReceiver(int portnum) {
+	int iResult;
+	m_portnum = new char[10];memset(m_portnum, 0, 10);
+	_itoa(portnum, m_portnum, 10);
+
+	
+
+	struct addrinfo listenInfo, *result;
+	ZeroMemory(&listenInfo, sizeof(listenInfo));
+	listenInfo.ai_family = AF_INET;
+	listenInfo.ai_socktype = SOCK_STREAM;
+	listenInfo.ai_protocol = IPPROTO_TCP;
+	listenInfo.ai_flags = AI_PASSIVE;
+
+
+	iResult = getaddrinfo(NULL, this->m_portnum, &listenInfo, &result);
+	if (iResult != 0) {
+		std::cout << "TcpReceiver_ERROR_GETADDRINFO_FAIL" << std::endl;
+	}
+
+	m_listen_socket = socket(listenInfo.ai_family, listenInfo.ai_socktype, listenInfo.ai_protocol);
+	if (m_listen_socket == INVALID_SOCKET) {
+		std::cout << "TcpReceiver_ERROR_CREATESOCKETFAIL_FAIL" << std::endl;
+	}
+
+	iResult = bind(this->m_listen_socket, result->ai_addr, result->ai_addrlen);
+	if (iResult == SOCKET_ERROR) {
+		std::cout << "TcpReceiver_ERROR_BINDPORT_FAIL" << std::endl;
+		closesocket(this->m_listen_socket);
+	}
+
+	freeaddrinfo(result);
+
+	iResult = listen(this->m_listen_socket, SOMAXCONN);
+	if (iResult == SOCKET_ERROR) {
+		std::cout << "TcpReceiver_ERROR_LISTEN_FAIL" << std::endl;
+		closesocket(this->m_listen_socket);
+	}
+}
+TcpReceiver::~TcpReceiver(){
 
 }
-TcpReceiver::~TcpReceiver() {
-}
-
 int TcpReceiver::start() {
 	int iResult;
 
-	struct addrinfo *result = NULL;
-	struct addrinfo hints;
+	this->m_started = TRUE;
+	int buflen = 512;
+	char* buff = new char[buflen];
 
-	ZeroMemory(&hints, sizeof(hints));
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_protocol = IPPROTO_TCP;
-	hints.ai_flags = AI_PASSIVE;
-
-	//Create port info
-	iResult = getaddrinfo(NULL,this->m_port_num, &hints, &result);
-	if (iResult != 0) {
-		return TcpReceiver_ERROR_CREATESOCKETFAIL_FAIL;
-	}
-
-	//Create socket
-	this->m_sock = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-	if (this->m_sock == INVALID_SOCKET)
-		return TcpReceiver_ERROR_GETADDRINFO_FAIL;
-
-	//Setup listen port
- 	iResult = bind(this->m_sock, result->ai_addr, result->ai_addrlen);
-	if (iResult == SOCKET_ERROR) {
-		return TcpReceiver_ERROR_BINDPORT_FAIL;
-	}
-	
-	freeaddrinfo(result);
-
-	iResult = listen(this->m_sock, SOMAXCONN);
-	if (iResult == SOCKET_ERROR){
-		closesocket(this->m_sock);
-		return TcpReceiver_ERROR_LISTEN_FAIL;
-	}
-
-	m_client_sock = accept(this->m_sock, NULL, NULL);
-	
-	if (m_client_sock == INVALID_SOCKET) {
-		closesocket(this->m_sock);
-		return TcpReceiver_ERROR_ACCEPT_FAIL;
-	}
-
-	closesocket(this->m_sock);
-
-	//Retrive data
 	do {
-		iResult = recv(m_client_sock, m_recv_buffer, BUFFERLEN, 0);
-		if (iResult > 0)
-		{
-			switch (m_mode)
+		SOCKET clientSocket;
+		sockaddr info;
+
+		clientSocket = accept(this->m_listen_socket, &info, NULL);
+		if (clientSocket == INVALID_SOCKET) {
+			std::cout << "TcpReceiver_ERROR_ACCEPT_FAIL" << std::endl;
+			continue;
+		}
+
+		do {
+			iResult = recv(clientSocket, buff, buflen, 0);
+			if (iResult > 0) {
+				std::cout << buff;
+			}
+			else if (iResult == 0)
 			{
-			case CACHEMANAGER_TYPE_UPLOAD:
-				this->m_cache_manager->TcpStore(m_recv_buffer, CACHEMANAGER_TYPE_UPLOAD);
-				break;
-			case CACHEMANAGER_TYPE_DOWNLOAD: 
-				this->m_cache_manager->TcpStore(m_recv_buffer, CACHEMANAGER_TYPE_DOWNLOAD);
+				std::cout << "Receiver closing" << std::endl;
+			}
+			else
+			{
+				std::cout << "TcpReceiver_ERROR_RETRIEVE_FAIL" << std::endl;
+				closesocket(clientSocket);
 				break;
 			}
-			std::cout << "Bytes received:" << iResult << std::endl;
-		}
-		else if (iResult == 0) {
-			std::cout << "Connection closing..."<< std::endl;
-		}
-		else
-		{
-			closesocket(m_client_sock);
-			return TcpReceiver_ERROR_RETRIEVE_FAIL;
-		}
-	} while (iResult > 0);
-	
+		} while (iResult > 0);
 
-	//Shudown socket
-	iResult = shutdown(this->m_client_sock, SD_SEND);
-	if (iResult == SOCKET_ERROR) {
-		return TcpReceiver_ERROR_SHUTDOWN_FAIL;
-	}
+	} while (this->m_started == TRUE);
 
-	closesocket(this->m_client_sock);
-
-	this->m_started = true;
-
-	//TODO create listener 
+	return TRUE;
 }
-int TcpReceiver::stop(){
-	this->m_started = false;
+int TcpReceiver::stop() {
+	this->m_started = FALSE;
 
-	return 0;
+	return TRUE;
 }

@@ -1,0 +1,11 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/BandwidthLimitProxy/Debug
+/Debug
+/BandwidthLimitProxy/BandwidthLimitProxy.vcxproj.filters
+/BandwidthLimitProxy/BandwidthLimitProxy.vcxproj
+*.suo
+/BandwidthLimitProxy.sdf
+/BandwidthLimitProxy.opensdf

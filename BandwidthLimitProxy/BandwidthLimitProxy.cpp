@@ -1,5 +1,5 @@
 #include "BandwidthLimitProxy.h"
-
+#include "Proxy.h";
 
 int main(int argc, char** argv)
 {
@@ -16,15 +16,12 @@ int main(int argc, char** argv)
 		4.Input download bandwidth limitation<in kbps>
 	}
 	*/
-	CacheManager *myCache = new CacheManager(new BandwidthManager());
-	WORD sockVersion = MAKEWORD(2, 2);
-	WSADATA data;
-	if (WSAStartup(sockVersion, &data) != 0) {
-		return TRANSFERLAYER_ERROR_WSASTARTUP_FAIL;
-	}
 
-	TcpReceiver *receiver2 = new TcpReceiver(myCache, 1080, CACHEMANAGER_TYPE_UPLOAD);
-	
-	int iResult = receiver2->start();
+	int iResult = 0;
+	Proxy *myProxy = new Proxy();
+	myProxy->start();
+	TcpReceiver *tcpReceiver = new TcpReceiver(1080);
+	tcpReceiver->start();
+
 	return 0;
 }
