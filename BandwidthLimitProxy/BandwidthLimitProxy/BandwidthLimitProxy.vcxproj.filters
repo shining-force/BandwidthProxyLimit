@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\TransferLayer">
+      <UniqueIdentifier>{50fedd22-b0c3-4eed-a5c3-5459a3b40c06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Common">
+      <UniqueIdentifier>{309a91ef-2c66-408e-8ca8-4fb3c67cc1a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\BusinessLayer">
+      <UniqueIdentifier>{401f3150-0d2e-472d-84e3-cf77d3580a13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\TransferLayer">
+      <UniqueIdentifier>{ca81a9db-2746-4f75-9a29-797060e47ddb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BusinessLayer">
+      <UniqueIdentifier>{5f3f336e-fb7a-4054-a120-a39ce8ce0c7b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\BandwidthLimitProxy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Proxy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TcpReceiver.h">
+      <Filter>Header Files\TransferLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TcpTransmitter.h">
+      <Filter>Header Files\TransferLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TransferLayer.h">
+      <Filter>Header Files\TransferLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\UdpReceiver.h">
+      <Filter>Header Files\TransferLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\UdpTransmitter.h">
+      <Filter>Header Files\TransferLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Codes.hpp">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\BandwidthManager.h">
+      <Filter>Header Files\BusinessLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CacheManager.h">
+      <Filter>Header Files\BusinessLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\PortMappingManager.h">
+      <Filter>Header Files\BusinessLayer</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Proxy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\BandwidthLimitProxy.cpp">
+      <Filter>Source Files\BusinessLayer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CacheManager.cpp">
+      <Filter>Source Files\BusinessLayer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TcpReceiver.cpp">
+      <Filter>Source Files\TransferLayer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TransferLayer.cpp">
+      <Filter>Source Files\TransferLayer</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
