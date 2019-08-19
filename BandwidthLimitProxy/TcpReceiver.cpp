@@ -42,41 +42,58 @@ TcpReceiver::TcpReceiver(int portnum) {
 TcpReceiver::~TcpReceiver(){
 
 }
-int TcpReceiver::start() {
-	int iResult;
 
-	this->m_started = TRUE;
+
+
+DWORD WINAPI recieverThread(LPVOID lpParameter) {
+	int iResult;
 	int buflen = 512;
 	char* buff = new char[buflen];
 
+	SOCKET clientSocket = (SOCKET)lpParameter;
+	std::cout << "current thread id:"<<GetCurrentThreadId() << std::endl;
+
+	
+	if (clientSocket == INVALID_SOCKET) {
+		std::cout << "TcpReceiver_ERROR_ACCEPT_FAIL" << std::endl;
+		return -1;
+	}
+
 	do {
-		SOCKET clientSocket;
-		sockaddr info;
-
-		clientSocket = accept(this->m_listen_socket, &info, NULL);
-		if (clientSocket == INVALID_SOCKET) {
-			std::cout << "TcpReceiver_ERROR_ACCEPT_FAIL" << std::endl;
-			continue;
+		iResult = recv(clientSocket, buff, buflen, 0);
+		if (iResult > 0) {
+			std::cout << buff;
 		}
+		else if (iResult == 0)
+		{
+			std::cout << "Receiver closing" << std::endl;
+		}
+		else
+		{
+			std::cout << "TcpReceiver_ERROR_RETRIEVE_FAIL" << std::endl;
+			closesocket(clientSocket);
+			break;
+		}
+	} while (iResult > 0);
 
-		do {
-			iResult = recv(clientSocket, buff, buflen, 0);
-			if (iResult > 0) {
-				std::cout << buff;
-			}
-			else if (iResult == 0)
-			{
-				std::cout << "Receiver closing" << std::endl;
-			}
-			else
-			{
-				std::cout << "TcpReceiver_ERROR_RETRIEVE_FAIL" << std::endl;
-				closesocket(clientSocket);
-				break;
-			}
-		} while (iResult > 0);
+	return 0;
+}
 
+DWORD WINAPI TcpReceiver::recieverLoop(LPVOID lpParameter) {
+	do {
+		sockaddr info;
+		CreateThread(NULL, 0, recieverThread, (LPVOID)accept(this->m_listen_socket, &info, NULL), 0, NULL);
+		Sleep(300);
 	} while (this->m_started == TRUE);
+}
+
+
+int TcpReceiver::start() {
+
+
+	this->m_started = TRUE;
+	CreateThread(NULL, 0, &TcpReceiver::recieverLoop,NULL, 0, NULL);
+
 
 	return TRUE;
 }
