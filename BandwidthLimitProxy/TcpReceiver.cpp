@@ -38,6 +38,8 @@ TcpReceiver::TcpReceiver(int portnum) {
 		std::cout << "TcpReceiver_ERROR_LISTEN_FAIL" << std::endl;
 		closesocket(this->m_listen_socket);
 	}
+
+	m_reciever_threads = new std::list<std::thread*>();
 }
 TcpReceiver::~TcpReceiver(){
 
@@ -45,7 +47,7 @@ TcpReceiver::~TcpReceiver(){
 
 
 
-DWORD WINAPI recieverThread(LPVOID lpParameter) {
+int recieverThread(void* lpParameter) {
 	int iResult;
 	int buflen = 512;
 	char* buff = new char[buflen];
@@ -79,10 +81,14 @@ DWORD WINAPI recieverThread(LPVOID lpParameter) {
 	return 0;
 }
 
-DWORD WINAPI TcpReceiver::recieverLoop(LPVOID lpParameter) {
+void TcpReceiver::recieverLoop() {
 	do {
 		sockaddr info;
-		CreateThread(NULL, 0, recieverThread, (LPVOID)accept(this->m_listen_socket, &info, NULL), 0, NULL);
+		//CreateThread(NULL, 0, recieverThread, (LPVOID)accept(this->m_listen_socket, &info, NULL), 0, NULL);
+		std::thread *t =new  std::thread((recieverThread, (void*)accept(this->m_listen_socket, &info, NULL)));
+
+		m_reciever_threads->push_back(t);
+		
 		Sleep(300);
 	} while (this->m_started == TRUE);
 }
@@ -90,10 +96,9 @@ DWORD WINAPI TcpReceiver::recieverLoop(LPVOID lpParameter) {
 
 int TcpReceiver::start() {
 
-
 	this->m_started = TRUE;
-	CreateThread(NULL, 0, &TcpReceiver::recieverLoop,NULL, 0, NULL);
-
+  	std::thread t(&TcpReceiver::recieverLoop,this);
+	t.detach();
 
 	return TRUE;
 }

@@ -7,9 +7,9 @@
 #include <WS2tcpip.h>
 #include <thread>
 #include <iostream>
+#include <list>
 
 #define BUFFERLEN 512
-
 
 class TcpReceiver {
 public:
@@ -21,7 +21,7 @@ private:
 	char *m_portnum;
 	SOCKET m_listen_socket;
 	BOOL m_started;
-	DWORD WINAPI recieverLoop(LPVOID lpParameter);
-	
+	void  recieverLoop();
+	std::list<std::thread*> *m_reciever_threads;
 };
 

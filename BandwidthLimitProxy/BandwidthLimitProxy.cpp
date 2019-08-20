@@ -23,5 +23,9 @@ int main(int argc, char** argv)
 	TcpReceiver *tcpReceiver = new TcpReceiver(1080);
 	tcpReceiver->start();
 
+
+	Sleep(10000);
+	tcpReceiver->stop();
+	myProxy->stop();
 	return 0;
 }
