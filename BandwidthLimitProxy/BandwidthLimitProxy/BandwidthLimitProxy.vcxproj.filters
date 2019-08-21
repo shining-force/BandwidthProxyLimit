@@ -68,9 +68,6 @@
     <ClCompile Include="..\Proxy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\BandwidthLimitProxy.cpp">
-      <Filter>Source Files\BusinessLayer</Filter>
-    </ClCompile>
     <ClCompile Include="..\CacheManager.cpp">
       <Filter>Source Files\BusinessLayer</Filter>
     </ClCompile>
@@ -79,6 +76,9 @@
     </ClCompile>
     <ClCompile Include="..\TransferLayer.cpp">
       <Filter>Source Files\TransferLayer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\BandwidthLimitProxy.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

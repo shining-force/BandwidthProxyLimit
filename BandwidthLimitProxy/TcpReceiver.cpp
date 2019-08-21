@@ -45,18 +45,22 @@ TcpReceiver::~TcpReceiver(){
 
 
 
-DWORD WINAPI recieverThread(LPVOID lpParameter) {
+void recieverThread(void* param,sockaddr *addr) {
 	int iResult;
 	int buflen = 512;
-	char* buff = new char[buflen];
+	char* buff = new char[buflen]; memset(buff, 0, 512);
 
-	SOCKET clientSocket = (SOCKET)lpParameter;
+	SOCKET clientSocket = (SOCKET)param;
+	
 	std::cout << "current thread id:"<<GetCurrentThreadId() << std::endl;
-
+	struct sockaddr_in *s = (struct sockaddr_in *)&addr;
+	char* info = new char[256]; memset(info, 0, 256);
+	InetNtop(AF_INET, &s->sin_addr, info, 256);
+	std::cout << "source addr:" << info << "source port:" << s->sin_port << std::endl;
 	
 	if (clientSocket == INVALID_SOCKET) {
 		std::cout << "TcpReceiver_ERROR_ACCEPT_FAIL" << std::endl;
-		return -1;
+		return;
 	}
 
 	do {
@@ -75,14 +79,18 @@ DWORD WINAPI recieverThread(LPVOID lpParameter) {
 			break;
 		}
 	} while (iResult > 0);
-
-	return 0;
 }
 
-DWORD WINAPI TcpReceiver::recieverLoop(LPVOID lpParameter) {
+void TcpReceiver::recieverLoop() {
+
 	do {
 		sockaddr info;
-		CreateThread(NULL, 0, recieverThread, (LPVOID)accept(this->m_listen_socket, &info, NULL), 0, NULL);
+		//CreateThread(NULL, 0, recieverThread, (LPVOID)accept(this->m_listen_socket, &info, NULL), 0, NULL);
+
+		SOCKET *get = (SOCKET*)accept(this->m_listen_socket, &info, NULL);
+
+		std::thread t(recieverThread, (void*)&get,&info);
+		t.detach();
 		Sleep(300);
 	} while (this->m_started == TRUE);
 }
@@ -92,8 +100,9 @@ int TcpReceiver::start() {
 
 
 	this->m_started = TRUE;
-	CreateThread(NULL, 0, &TcpReceiver::recieverLoop,NULL, 0, NULL);
+	std::thread t(&TcpReceiver::recieverLoop,this);
 
+	t.detach();
 
 	return TRUE;
 }

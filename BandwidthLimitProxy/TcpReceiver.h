@@ -21,7 +21,6 @@ private:
 	char *m_portnum;
 	SOCKET m_listen_socket;
 	BOOL m_started;
-	DWORD WINAPI recieverLoop(LPVOID lpParameter);
-	
+	void recieverLoop();
 };
 
